@@ -345,7 +345,7 @@ footer .heart{color:var(--accent2);animation:pulse 2s ease-in-out infinite;displ
     <a class="sidebar-link" onclick="goTo('pet-pet-repo')"><span class="dot" style="background:var(--accent3)"></span>Pet: Repository</a>
     <a class="sidebar-link" onclick="goTo('pet-pet-service')"><span class="dot" style="background:var(--accent5)"></span>Pet: Service</a>
     <a class="sidebar-link" onclick="goTo('pet-pet-controller')"><span class="dot" style="background:var(--accent)"></span>Pet: Controller</a>
-    <a class="sidebar-link" onclick="goTo('pet-testar')"><span class="dot" style="background:var(--accent6)"></span>Testando no Swagger</a>
+    <a class="sidebar-link" onclick="goTo('pet-testar')"><span class="dot" style="background:var(--accent6)"></span>Testando no Insomnia</a>
   </div>
 </nav>
 
@@ -691,7 +691,7 @@ footer .heart{color:var(--accent2);animation:pulse 2s ease-in-out infinite;displ
 }</pre>
     </div>
 
-    <h4 style="margin:20px 0 10px;color:var(--accent4)">🧪 Como testar no Swagger</h4>
+    <h4 style="margin:20px 0 10px;color:var(--accent4)">🧪 Como testar no Insomnia</h4>
     <div class="code-block">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -736,7 +736,7 @@ footer .heart{color:var(--accent2);animation:pulse 2s ease-in-out infinite;displ
   <div class="card">
     <div class="problem-box">
       <div class="problem-title">🤔 A situação</div>
-      <p style="color:var(--text-dim)">Uma matrícula já existe. O professor lançou a prova e quer <strong style="color:var(--text)">atualizar só as duas notas</strong>. Como o cliente (Swagger) vai mandar esses dados pra nossa API?</p>
+      <p style="color:var(--text-dim)">Uma matrícula já existe. O professor lançou a prova e quer <strong style="color:var(--text)">atualizar só as duas notas</strong>. Como o cliente (Insomnia) vai mandar esses dados pra nossa API?</p>
     </div>
 
     <p style="margin:20px 0 10px;color:var(--text-dim)">Se usarmos o Model <code>MatriculaAluno</code> direto, o cliente teria que mandar ISSO aqui pra atualizar as notas:</p>
@@ -1083,7 +1083,7 @@ matricula.setNota2(dto.getNota2());</pre>
       <pre><span class="pkg">import br.com.alunoonline.api.dtos.AtualizarNotasRequestDTO;</span></pre>
     </div>
 
-    <h4 style="margin:20px 0 10px;color:var(--accent4)">🧪 Como testar no Swagger</h4>
+    <h4 style="margin:20px 0 10px;color:var(--accent4)">🧪 Como testar no Insomnia</h4>
     <div class="code-block">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1856,13 +1856,13 @@ br.com.petshop.api/
   <div class="step-header">
     <div class="step-number sn-purple">🧪</div>
     <div>
-      <div class="step-title">Testando tudo no Swagger</div>
+      <div class="step-title">Testando tudo no Insomnia</div>
       <div style="color:var(--text-dim);font-size:0.88rem">Hora de ver o Petshop funcionando!</div>
     </div>
   </div>
 
   <div class="card">
-    <p style="color:var(--text-dim);margin-bottom:20px">Rodem a aplicação e acessem <code>http://localhost:8080/swagger-ui.html</code>. Aqui estão os JSONs pra testar:</p>
+    <p style="color:var(--text-dim);margin-bottom:20px">Rodem a aplicação e abram o <strong>Insomnia</strong>. Criem as requests com a URL base <code>http://localhost:8080</code>. Aqui estão os JSONs pra testar:</p>
 
     <h4 style="color:var(--accent2);margin:16px 0 10px">👤 1. Criar um cliente</h4>
     <div class="code-block">
@@ -1927,7 +1927,7 @@ br.com.petshop.api/
       <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> DTO para operações específicas</div>
       <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> PATCH para atualizações parciais</div>
       <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Regras de negócio no Service</div>
-      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Testes no Swagger</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Testes no Insomnia</div>
     </div>
   </div>
 </section>
