@@ -1280,6 +1280,17 @@ br.com.petshop.api/
   </div>
 
   <div class="card">
+    <div class="concept">
+      <div class="concept-title">💡 Dica para fazer sozinho</div>
+      <p>É <strong>exatamente</strong> o mesmo padrão do Aluno e do Professor! Crie uma classe com <code>@Entity</code>, <code>@Table</code>, <code>@Data</code>, <code>@AllArgsConstructor</code>, <code>@NoArgsConstructor</code>. Os campos são: <strong>id</strong> (Long, com @Id e @GeneratedValue), <strong>nomeCompleto</strong> (String), <strong>email</strong> (String) e <strong>telefone</strong> (String). Só isso!</p>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>👀 Ver código completo</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
     <div class="code-block with-lines">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1312,6 +1323,8 @@ br.com.petshop.api/
     <span class="kw">private</span> <span class="tp">String</span> telefone;
 }</pre>
     </div>
+      </div>
+    </div>
 
     <div class="tip">
       <span class="tip-icon">🎯</span>
@@ -1333,6 +1346,17 @@ br.com.petshop.api/
   </div>
 
   <div class="card">
+    <div class="concept">
+      <div class="concept-title">💡 Dica para fazer sozinho</div>
+      <p>Crie uma <strong>interface</strong> (não classe!) com <code>@Repository</code> que <strong>extends JpaRepository</strong>. Os tipos genéricos são a entidade (<code>Cliente</code>) e o tipo do id (<code>Long</code>). Pronto, não precisa de mais nada dentro!</p>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>👀 Ver código completo</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
     <div class="code-block with-lines">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1349,6 +1373,8 @@ br.com.petshop.api/
 <span class="an">@Repository</span>
 <span class="kw">public interface</span> <span class="tp">ClienteRepository</span> <span class="kw">extends</span> <span class="tp">JpaRepository</span>&lt;<span class="tp">Cliente</span>, <span class="tp">Long</span>&gt; {
 }</pre>
+    </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1371,6 +1397,17 @@ br.com.petshop.api/
       <div class="tip-content"><strong>Novidade boa!</strong> Lembram do <code>atualizarAlunoPorId</code> que era meio complicado? Agora vou mostrar um jeito <strong style="color:var(--accent3)">muito mais simples</strong> de atualizar!</div>
     </div>
 
+    <div class="concept">
+      <div class="concept-title">💡 Dica para fazer sozinho</div>
+      <p>Crie uma classe com <code>@Service</code> e injete o <code>ClienteRepository</code> com <code>@Autowired</code>. Faça os 5 métodos: <strong>criarCliente</strong> (save), <strong>buscarTodosClientes</strong> (findAll), <strong>buscarClientePorId</strong> (findById, retorna Optional), <strong>deletarClientePorId</strong> (deleteById) e <strong>atualizarClientePorId</strong>. Para o update, o truque é simples: <code>cliente.setId(id)</code> e depois <code>save</code> — o Spring atualiza se o id já existe!</p>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>👀 Ver código completo</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
     <div class="code-block with-lines">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1417,6 +1454,8 @@ br.com.petshop.api/
     }
 }</pre>
     </div>
+      </div>
+    </div>
 
     <div class="solution-box">
       <div class="solution-title">✨ Por que isso funciona?</div>
@@ -1443,6 +1482,17 @@ br.com.petshop.api/
   </div>
 
   <div class="card">
+    <div class="concept">
+      <div class="concept-title">💡 Dica para fazer sozinho</div>
+      <p>Crie uma classe com <code>@RestController</code> e <code>@RequestMapping("/clientes")</code>. Injete o <code>ClienteService</code>. Faça 5 endpoints: <strong>POST</strong> (criarCliente, status 201), <strong>GET</strong> (buscarTodos, status 200), <strong>GET /{id}</strong> (buscarPorId com @PathVariable), <strong>DELETE /{id}</strong> (deletar, status 204) e <strong>PUT /{id}</strong> (atualizar, status 204, recebe @RequestBody + @PathVariable).</p>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>👀 Ver código completo</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
     <div class="code-block with-lines">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1500,6 +1550,8 @@ br.com.petshop.api/
     }
 }</pre>
     </div>
+      </div>
+    </div>
 
     <div class="tip">
       <span class="tip-icon">🎯</span>
@@ -1526,6 +1578,17 @@ br.com.petshop.api/
       <p>Um cliente pode ter <strong>vários pets</strong>. Cada pet pertence a <strong>um cliente</strong>. Isso é um <code>@ManyToOne</code> — exatamente igual ao Disciplina → Professor!</p>
     </div>
 
+    <div class="concept">
+      <div class="concept-title">💡 Dica para fazer sozinho</div>
+      <p>Mesma estrutura do Cliente! Campos: <strong>id</strong> (Long), <strong>nome</strong> (String), <strong>raca</strong> (String), <strong>idade</strong> (Integer). A diferença é o campo <strong>cliente</strong> do tipo <code>Cliente</code>, com as anotações <code>@ManyToOne</code> e <code>@JoinColumn(name = "cliente_id")</code>. Lembrem do Disciplina → Professor!</p>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>👀 Ver código completo</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
     <div class="code-block with-lines">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1561,6 +1624,8 @@ br.com.petshop.api/
     <span class="an">@JoinColumn</span>(name = <span class="st">"cliente_id"</span>)
     <span class="kw">private</span> <span class="tp">Cliente</span> cliente;
 }</pre>
+    </div>
+      </div>
     </div>
 
     <h4 style="margin:20px 0 12px;color:var(--accent4)">🗄️ Como fica no banco</h4>
@@ -1603,6 +1668,17 @@ br.com.petshop.api/
   </div>
 
   <div class="card">
+    <div class="concept">
+      <div class="concept-title">💡 Dica para fazer sozinho</div>
+      <p>Igualzinho ao <code>ClienteRepository</code>! Interface com <code>@Repository</code> que extends <code>JpaRepository&lt;Pet, Long&gt;</code>. Corpo vazio. Pronto!</p>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>👀 Ver código completo</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
     <div class="code-block with-lines">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1620,6 +1696,8 @@ br.com.petshop.api/
 <span class="kw">public interface</span> <span class="tp">PetRepository</span> <span class="kw">extends</span> <span class="tp">JpaRepository</span>&lt;<span class="tp">Pet</span>, <span class="tp">Long</span>&gt; {
 }</pre>
     </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1636,6 +1714,17 @@ br.com.petshop.api/
   </div>
 
   <div class="card">
+    <div class="concept">
+      <div class="concept-title">💡 Dica para fazer sozinho</div>
+      <p>Mesma estrutura do <code>ClienteService</code>! Classe com <code>@Service</code>, injete o <code>PetRepository</code>. Faça 4 métodos: <strong>criarPet</strong> (save), <strong>buscarTodosPets</strong> (findAll), <strong>buscarPetPorId</strong> (findById) e <strong>deletarPetPorId</strong> (deleteById). Sem update desta vez!</p>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>👀 Ver código completo</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
     <div class="code-block with-lines">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1676,6 +1765,8 @@ br.com.petshop.api/
     }
 }</pre>
     </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1692,6 +1783,17 @@ br.com.petshop.api/
   </div>
 
   <div class="card">
+    <div class="concept">
+      <div class="concept-title">💡 Dica para fazer sozinho</div>
+      <p>Mesma estrutura do <code>ClienteController</code>! Use <code>@RestController</code> com <code>@RequestMapping("/pets")</code>. Injete o <code>PetService</code>. Faça 4 endpoints: <strong>POST</strong> (criarPet, 201), <strong>GET</strong> (buscarTodos, 200), <strong>GET /{id}</strong> (buscarPorId, 200) e <strong>DELETE /{id}</strong> (deletar, 204). Sem PUT desta vez!</p>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>👀 Ver código completo</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
     <div class="code-block with-lines">
       <div class="code-header">
         <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
@@ -1741,6 +1843,8 @@ br.com.petshop.api/
         petService.<span class="fn">deletarPetPorId</span>(id);
     }
 }</pre>
+    </div>
+      </div>
     </div>
   </div>
 </section>
