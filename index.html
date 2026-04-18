@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula Final — Matrícula, DTO e Desafio Petshop | UNIESP</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a12;
+  --surface:#12121e;
+  --surface2:#1a1a2e;
+  --surface3:#222240;
+  --accent:#6c63ff;
+  --accent2:#ff6b6b;
+  --accent3:#4ecdc4;
+  --accent4:#45b7d1;
+  --accent5:#f7b731;
+  --accent6:#a78bfa;
+  --accent7:#06d6a0;
+  --java:#f89820;
+  --spring:#6db33f;
+  --petshop:#ff9f43;
+  --text:#eef0f8;
+  --text-dim:#8892b0;
+  --code-bg:#0d0d1a;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;overflow-x:hidden}
+
+/* BACKGROUND */
+.bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(108,99,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(108,99,255,0.03) 1px,transparent 1px);background-size:50px 50px}
+.bg-orbs{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.bg-orbs .orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:0.08;animation:orbFloat 25s ease-in-out infinite}
+.bg-orbs .orb:nth-child(1){width:600px;height:600px;background:var(--accent);top:-150px;left:-150px}
+.bg-orbs .orb:nth-child(2){width:500px;height:500px;background:var(--spring);bottom:-150px;right:-150px;animation-delay:-8s}
+.bg-orbs .orb:nth-child(3){width:400px;height:400px;background:var(--petshop);top:40%;left:60%;animation-delay:-16s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,-40px) scale(1.1)}66%{transform:translate(-40px,60px) scale(0.9)}}
+
+/* PROGRESS */
+.progress-track{position:fixed;top:0;left:0;width:100%;height:4px;z-index:200;background:rgba(255,255,255,0.03)}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--spring),var(--petshop));transition:width 0.3s;border-radius:0 2px 2px 0;box-shadow:0 0 20px var(--accent)}
+
+.container{max-width:960px;margin:0 auto;padding:20px;position:relative;z-index:1}
+
+/* SIDEBAR */
+.sidebar-nav{position:fixed;left:0;top:0;width:280px;height:100vh;background:var(--surface);border-right:1px solid rgba(108,99,255,0.1);z-index:100;transform:translateX(-100%);transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);overflow-y:auto;padding:24px 0}
+.sidebar-nav.open{transform:translateX(0)}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.sidebar-overlay.open{opacity:1;pointer-events:auto}
+.sidebar-header{padding:0 24px 20px;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:12px}
+.sidebar-header h3{font-size:1rem;color:var(--accent);font-weight:800;display:flex;align-items:center;gap:8px}
+.sidebar-group{padding:8px 16px}
+.sidebar-group-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);padding:8px;font-weight:700}
+.sidebar-link{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;color:var(--text-dim);text-decoration:none;font-size:0.85rem;font-weight:600;transition:all 0.2s;cursor:pointer}
+.sidebar-link:hover{background:rgba(108,99,255,0.1);color:var(--text)}
+.sidebar-link .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sidebar-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-dim);font-size:1.4rem;cursor:pointer;padding:4px 8px;border-radius:8px}
+.sidebar-close:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+
+.menu-toggle{position:fixed;top:16px;left:16px;z-index:98;background:var(--surface2);border:1px solid rgba(108,99,255,0.2);color:var(--text);width:44px;height:44px;border-radius:12px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.menu-toggle:hover{background:var(--accent);border-color:var(--accent)}
+
+/* HERO */
+.hero{text-align:center;padding:100px 20px 70px;position:relative}
+.hero-icons{font-size:3.5rem;display:flex;justify-content:center;gap:16px;margin-bottom:24px;animation:fadeSlideDown 0.8s ease both}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--accent6));color:white;font-weight:800;font-size:0.8rem;padding:6px 20px;border-radius:50px;text-transform:uppercase;letter-spacing:2px;margin-bottom:24px;animation:fadeSlideDown 0.8s ease 0.1s both}
+.hero h1{font-size:clamp(2.2rem,5.5vw,3.8rem);font-weight:900;background:linear-gradient(135deg,var(--text),var(--accent4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.15;margin-bottom:16px;animation:fadeSlideDown 0.8s ease 0.2s both}
+.hero .subtitle{font-size:1.15rem;color:var(--text-dim);max-width:650px;margin:0 auto 28px;animation:fadeSlideDown 0.8s ease 0.35s both}
+.hero-stack{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;animation:fadeSlideDown 0.8s ease 0.5s both}
+.stack-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:50px;font-size:0.8rem;font-weight:700;border:1px solid rgba(255,255,255,0.08);background:var(--surface2)}
+.stack-chip.mat{border-color:rgba(167,139,250,0.3);color:var(--accent6)}
+.stack-chip.dto{border-color:rgba(78,205,196,0.3);color:var(--accent3)}
+.stack-chip.pet{border-color:rgba(255,159,67,0.3);color:var(--petshop)}
+
+@keyframes fadeSlideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.5)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* CHAPTER DIVIDER */
+.chapter-divider{text-align:center;padding:60px 20px 30px;position:relative}
+.chapter-divider::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:60%;height:1px;background:linear-gradient(90deg,transparent,rgba(108,99,255,0.3),transparent)}
+.chapter-icon{font-size:3rem;display:block;margin-bottom:12px;animation:bounce 2s ease-in-out infinite}
+.chapter-number{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent6));color:white;font-weight:900;font-size:0.75rem;padding:4px 16px;border-radius:50px;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+.chapter-divider h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;margin-bottom:8px}
+.chapter-divider h2.grad-mat{background:linear-gradient(135deg,var(--accent6),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.chapter-divider h2.grad-dto{background:linear-gradient(135deg,var(--accent3),var(--accent4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.chapter-divider h2.grad-pet{background:linear-gradient(135deg,var(--petshop),var(--accent5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.chapter-subtitle{color:var(--text-dim);font-size:1rem;max-width:500px;margin:0 auto}
+
+/* SECTION */
+.step-section{margin:30px 0;opacity:0;transform:translateY(40px);transition:opacity 0.7s ease,transform 0.7s ease}
+.step-section.visible{opacity:1;transform:translateY(0)}
+.step-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.step-number{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.3rem;color:var(--bg);flex-shrink:0;position:relative}
+.step-number::after{content:'';position:absolute;inset:-3px;border-radius:17px;background:inherit;opacity:0.25;z-index:-1}
+.sn-red{background:var(--accent2)}
+.sn-blue{background:var(--accent4)}
+.sn-green{background:var(--accent3)}
+.sn-yellow{background:var(--accent5)}
+.sn-purple{background:var(--accent6)}
+.sn-main{background:var(--accent)}
+.sn-pet{background:var(--petshop)}
+.step-title{font-size:1.45rem;font-weight:800}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid rgba(255,255,255,0.05);border-radius:20px;padding:32px;margin-bottom:24px;position:relative;overflow:hidden;transition:border-color 0.3s}
+.card:hover{border-color:rgba(108,99,255,0.15)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity 0.3s}
+.card:hover::before{opacity:1}
+
+/* CONCEPT */
+.concept{background:var(--surface2);border-radius:16px;padding:24px;margin:16px 0;border-left:4px solid var(--accent5)}
+.concept-title{font-family:'Caveat',cursive;font-size:1.4rem;color:var(--accent5);margin-bottom:8px}
+.concept p{color:var(--text-dim);font-size:0.95rem}
+
+/* ANALOGY */
+.analogy{background:linear-gradient(135deg,rgba(167,139,250,0.06),rgba(69,183,209,0.06));border:1px solid rgba(167,139,250,0.15);border-radius:16px;padding:24px;margin:16px 0;position:relative}
+.analogy::before{content:'💡';font-size:1.6rem;position:absolute;top:-14px;left:20px}
+.analogy-title{font-family:'Caveat',cursive;font-size:1.3rem;color:var(--accent6);margin-bottom:8px}
+
+/* TIP / WARNING */
+.tip{background:rgba(78,205,196,0.06);border:1px solid rgba(78,205,196,0.15);border-radius:14px;padding:20px 24px;margin:16px 0;display:flex;gap:12px;align-items:flex-start}
+.tip-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.tip-content{color:var(--text-dim);font-size:0.92rem}
+.tip-content strong{color:var(--accent3)}
+
+.warning{background:rgba(247,183,49,0.06);border:1px solid rgba(247,183,49,0.15);border-radius:14px;padding:20px 24px;margin:16px 0;display:flex;gap:12px;align-items:flex-start}
+.warning-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+
+/* DORS BEFORE SOLUTION */
+.problem-box{background:linear-gradient(135deg,rgba(255,107,107,0.08),rgba(247,183,49,0.05));border:1px solid rgba(255,107,107,0.2);border-radius:14px;padding:20px 24px;margin:16px 0;position:relative}
+.problem-box::before{content:'🤔';font-size:1.6rem;position:absolute;top:-14px;left:20px}
+.problem-title{font-family:'Caveat',cursive;font-size:1.3rem;color:var(--accent2);margin-bottom:8px}
+
+.solution-box{background:linear-gradient(135deg,rgba(78,205,196,0.08),rgba(6,214,160,0.05));border:1px solid rgba(78,205,196,0.2);border-radius:14px;padding:20px 24px;margin:16px 0;position:relative}
+.solution-box::before{content:'✨';font-size:1.6rem;position:absolute;top:-14px;left:20px}
+.solution-title{font-family:'Caveat',cursive;font-size:1.3rem;color:var(--accent3);margin-bottom:8px}
+
+/* CODE BLOCKS */
+.code-block{background:var(--code-bg);border-radius:14px;margin:16px 0;overflow:hidden;border:1px solid rgba(255,255,255,0.05);position:relative}
+.code-header{background:rgba(255,255,255,0.03);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.05)}
+.code-header .dots{display:flex;gap:6px}
+.code-header .dot{width:10px;height:10px;border-radius:50%}
+.code-header .dot:nth-child(1){background:#ff5f57}
+.code-header .dot:nth-child(2){background:#febc2e}
+.code-header .dot:nth-child(3){background:#28c840}
+.code-header .filename{color:var(--text-dim);font-size:0.78rem;font-family:'JetBrains Mono',monospace}
+.code-header .lang-badge{font-size:0.65rem;padding:2px 8px;border-radius:4px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.code-header .lang-badge.java{background:rgba(248,152,32,0.15);color:var(--java)}
+.code-header .lang-badge.json{background:rgba(247,183,49,0.15);color:var(--accent5)}
+pre{padding:20px;margin:0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.85;color:#c9d1d9;tab-size:4}
+.code-block.with-lines pre{padding-left:56px}
+.code-block .line-numbers{position:absolute;left:0;top:44px;padding:20px 12px 20px 16px;color:rgba(255,255,255,0.12);font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.85;text-align:right;user-select:none;border-right:1px solid rgba(255,255,255,0.03)}
+
+.kw{color:#c4a7e7}.fn{color:#82aaff}.st{color:#c3e88d}.cm{color:#546e7a;font-style:italic}.an{color:#ffcb6b}.tp{color:#f78c6c}.nb{color:#89ddff}.op{color:#c9d1d9}.num{color:#f78c6c}.bool{color:#82aaff}.pkg{color:#546e7a}
+
+/* ANNOTATION GRID */
+.annotation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.annotation-card{background:var(--surface2);border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.05);transition:all 0.3s}
+.annotation-card:hover{border-color:rgba(108,99,255,0.2);transform:translateY(-3px)}
+.annotation-card .anno-name{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--accent5);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.annotation-card .anno-name .at{color:var(--accent6)}
+.annotation-card .anno-desc{font-size:0.8rem;color:var(--text-dim);line-height:1.5}
+
+/* DB TABLE */
+.db-table{background:var(--surface2);border-radius:14px;overflow:hidden;margin:16px 0;border:1px solid rgba(255,255,255,0.06)}
+.db-table-header{background:rgba(69,183,209,0.1);padding:12px 20px;font-weight:800;font-size:0.85rem;color:var(--accent4);display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.db-table table{width:100%;border-collapse:collapse;font-size:0.82rem;font-family:'JetBrains Mono',monospace}
+.db-table th{padding:10px 16px;text-align:left;color:var(--text-dim);font-weight:700;font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02)}
+.db-table td{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text)}
+.db-table tr:last-child td{border-bottom:none}
+
+/* METHOD BADGE */
+.method-badge{display:inline-block;padding:2px 10px;border-radius:6px;font-weight:800;font-size:0.7rem;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px}
+.method-badge.post{background:rgba(73,204,144,0.15);color:#49cc90}
+.method-badge.get{background:rgba(97,175,254,0.15);color:#61affe}
+.method-badge.put{background:rgba(252,161,48,0.15);color:#fca130}
+.method-badge.patch{background:rgba(80,227,194,0.15);color:#50e3c2}
+.method-badge.delete{background:rgba(249,62,62,0.15);color:#f93e3e}
+
+/* ENDPOINT TABLE */
+.endpoint-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:0.85rem}
+.endpoint-table th{text-align:left;padding:10px 14px;color:var(--text-dim);font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.endpoint-table td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.endpoint-table tr:hover td{background:rgba(108,99,255,0.03)}
+.endpoint-table code{font-family:'JetBrains Mono',monospace;font-size:0.8rem}
+
+/* TOGGLER */
+.toggler{background:var(--surface);border-radius:14px;overflow:hidden;margin:16px 0;border:1px solid rgba(255,255,255,0.05)}
+.toggler-header{padding:16px 24px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background 0.3s;font-weight:700;font-size:0.95rem;user-select:none}
+.toggler-header:hover{background:rgba(255,255,255,0.02)}
+.toggler-arrow{transition:transform 0.3s;font-size:1rem;color:var(--text-dim)}
+.toggler-header.open .toggler-arrow{transform:rotate(180deg)}
+.toggler-body{max-height:0;overflow:hidden;transition:max-height 0.5s ease;padding:0 24px}
+.toggler-body.open{max-height:5000px;padding:0 24px 24px}
+
+/* COMPARISON (before/after) */
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.comparison-col{background:var(--surface2);border-radius:14px;padding:20px;border:1px solid rgba(255,255,255,0.05)}
+.comparison-col.bad{border-color:rgba(255,107,107,0.2)}
+.comparison-col.good{border-color:rgba(78,205,196,0.2)}
+.comparison-label{font-family:'Caveat',cursive;font-size:1.3rem;margin-bottom:10px}
+.comparison-col.bad .comparison-label{color:var(--accent2)}
+.comparison-col.good .comparison-label{color:var(--accent3)}
+@media(max-width:768px){.comparison{grid-template-columns:1fr}}
+
+/* SECTION CONNECTOR */
+.section-connector{display:flex;justify-content:center;margin:10px 0 20px}
+.section-connector .line{width:2px;height:50px;background:linear-gradient(to bottom,rgba(108,99,255,0.15),transparent)}
+
+/* CHALLENGE BANNER */
+.challenge-banner{
+  background:linear-gradient(135deg,rgba(255,159,67,0.12),rgba(247,183,49,0.06));
+  border:2px solid rgba(255,159,67,0.3);
+  border-radius:24px;padding:40px 32px;
+  margin:30px 0;
+  position:relative;overflow:hidden;text-align:center;
+}
+.challenge-banner::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--petshop),var(--accent5),var(--petshop));
+}
+.challenge-banner::after{
+  content:'';position:absolute;top:-50%;right:-10%;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(255,159,67,0.08),transparent 70%);
+  border-radius:50%;pointer-events:none;
+}
+.challenge-icons{font-size:3.5rem;margin-bottom:16px;position:relative;z-index:1}
+.challenge-title{font-size:2rem;font-weight:900;margin-bottom:12px;position:relative;z-index:1;background:linear-gradient(135deg,var(--petshop),var(--accent5));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.challenge-subtitle{color:var(--text-dim);font-size:1.05rem;max-width:500px;margin:0 auto;position:relative;z-index:1}
+
+/* FOOTER */
+footer{text-align:center;padding:50px 20px;color:var(--text-dim);font-size:0.82rem;border-top:1px solid rgba(255,255,255,0.04);margin-top:60px}
+footer .heart{color:var(--accent2);animation:pulse 2s ease-in-out infinite;display:inline-block}
+
+/* PROFESSOR BANNER */
+.prof-banner{
+  background:linear-gradient(135deg,rgba(108,99,255,0.08),rgba(109,179,63,0.06));
+  border:1px solid rgba(108,99,255,0.12);
+  border-radius:20px;padding:28px 32px;
+  display:flex;align-items:center;gap:24px;
+  position:relative;overflow:hidden;
+  animation:fadeSlideDown 0.8s ease 0.6s both;
+}
+.prof-banner::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--spring),var(--accent4),var(--accent5));
+}
+.prof-avatar{
+  width:72px;height:72px;border-radius:18px;
+  background:linear-gradient(135deg,var(--accent),var(--accent6));
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;flex-shrink:0;
+  box-shadow:0 8px 25px rgba(108,99,255,0.25);
+}
+.prof-info{flex:1;min-width:0}
+.prof-label{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:0.68rem;text-transform:uppercase;letter-spacing:2.5px;
+  color:var(--accent);font-weight:800;margin-bottom:4px;
+}
+.prof-label .verified{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--accent);color:white;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:0.6rem;
+}
+.prof-name{
+  font-size:1.3rem;font-weight:900;
+  background:linear-gradient(135deg,var(--text),var(--accent4));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.prof-role{
+  font-size:0.82rem;color:var(--text-dim);margin-top:2px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.prof-role .tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 10px;border-radius:50px;font-size:0.7rem;font-weight:700;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
+}
+@media(max-width:640px){
+  .prof-banner{flex-direction:column;text-align:center;padding:24px 20px}
+  .prof-info{display:flex;flex-direction:column;align-items:center}
+  .prof-role{justify-content:center}
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .container{padding:14px}
+  .card{padding:20px}
+  .hero{padding:60px 16px 40px}
+  pre{font-size:0.74rem}
+  .annotation-grid{grid-template-columns:1fr}
+  .endpoint-table{font-size:0.75rem}
+  .endpoint-table th,.endpoint-table td{padding:8px 10px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-orbs"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+
+<button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<nav class="sidebar-nav" id="sidebarNav">
+  <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+  <div class="sidebar-header">
+    <h3>📚 Aula de Hoje</h3>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">📝 Parte 1 — Matrícula</div>
+    <a class="sidebar-link" onclick="goTo('mat-intro')"><span class="dot" style="background:var(--accent6)"></span>Visão Geral</a>
+    <a class="sidebar-link" onclick="goTo('mat-enum')"><span class="dot" style="background:var(--accent5)"></span>Enum</a>
+    <a class="sidebar-link" onclick="goTo('mat-model')"><span class="dot" style="background:var(--accent2)"></span>Model</a>
+    <a class="sidebar-link" onclick="goTo('mat-repo')"><span class="dot" style="background:var(--accent3)"></span>Repository</a>
+    <a class="sidebar-link" onclick="goTo('mat-service-criar')"><span class="dot" style="background:var(--accent5)"></span>Service: criarMatricula</a>
+    <a class="sidebar-link" onclick="goTo('mat-controller-criar')"><span class="dot" style="background:var(--accent)"></span>Controller: criarMatricula</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">📦 Parte 2 — DTO</div>
+    <a class="sidebar-link" onclick="goTo('dto-problema')"><span class="dot" style="background:var(--accent2)"></span>O Problema</a>
+    <a class="sidebar-link" onclick="goTo('dto-solucao')"><span class="dot" style="background:var(--accent3)"></span>A Solução: DTO</a>
+    <a class="sidebar-link" onclick="goTo('dto-codigo')"><span class="dot" style="background:var(--accent4)"></span>Criando o DTO</a>
+    <a class="sidebar-link" onclick="goTo('atualizar-notas')"><span class="dot" style="background:var(--accent5)"></span>atualizarNotas</a>
+    <a class="sidebar-link" onclick="goTo('patch-controller')"><span class="dot" style="background:var(--accent)"></span>PATCH no Controller</a>
+  </div>
+  <div class="sidebar-group">
+    <div class="sidebar-group-title">🐶 Parte 3 — Desafio Petshop</div>
+    <a class="sidebar-link" onclick="goTo('desafio-intro')"><span class="dot" style="background:var(--petshop)"></span>O Desafio</a>
+    <a class="sidebar-link" onclick="goTo('pet-setup')"><span class="dot" style="background:var(--spring)"></span>Setup do Projeto</a>
+    <a class="sidebar-link" onclick="goTo('pet-cliente-model')"><span class="dot" style="background:var(--accent2)"></span>Cliente: Model</a>
+    <a class="sidebar-link" onclick="goTo('pet-cliente-repo')"><span class="dot" style="background:var(--accent3)"></span>Cliente: Repository</a>
+    <a class="sidebar-link" onclick="goTo('pet-cliente-service')"><span class="dot" style="background:var(--accent5)"></span>Cliente: Service</a>
+    <a class="sidebar-link" onclick="goTo('pet-cliente-controller')"><span class="dot" style="background:var(--accent)"></span>Cliente: Controller</a>
+    <a class="sidebar-link" onclick="goTo('pet-pet-model')"><span class="dot" style="background:var(--petshop)"></span>Pet: Model</a>
+    <a class="sidebar-link" onclick="goTo('pet-pet-repo')"><span class="dot" style="background:var(--accent3)"></span>Pet: Repository</a>
+    <a class="sidebar-link" onclick="goTo('pet-pet-service')"><span class="dot" style="background:var(--accent5)"></span>Pet: Service</a>
+    <a class="sidebar-link" onclick="goTo('pet-pet-controller')"><span class="dot" style="background:var(--accent)"></span>Pet: Controller</a>
+    <a class="sidebar-link" onclick="goTo('pet-testar')"><span class="dot" style="background:var(--accent6)"></span>Testando no Swagger</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- PROFESSOR BANNER -->
+<div class="prof-banner" style="margin-top:60px">
+  <div class="prof-avatar">👨‍🏫</div>
+  <div class="prof-info">
+    <div class="prof-label">
+      Professor <span class="verified">✓</span>
+    </div>
+    <div class="prof-name">Kelson Almeida</div>
+    <div class="prof-role">
+      <span class="tag">🎓 UNIESP</span>
+      <span class="tag">☕ Backend Java/Spring</span>
+      <span class="tag">📍 João Pessoa, PB</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-icons">📝 📦 🐶</div>
+  <div class="hero-badge">Última Aula — UNIESP</div>
+  <h1>Matrícula, DTO<br>e Desafio Petshop</h1>
+  <p class="subtitle">Hoje vamos fechar nosso projeto com chave de ouro: criar a Matrícula do Aluno, aprender o que é DTO, e depois vocês vão construir um Petshop inteiro do zero!</p>
+  <div class="hero-stack">
+    <span class="stack-chip mat">📝 MatriculaAluno</span>
+    <span class="stack-chip dto">📦 DTO</span>
+    <span class="stack-chip pet">🐶 Desafio Petshop</span>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+
+<!-- ╔══════════════════════════════════════════════════════════════╗ -->
+<!-- ║                    PARTE 1: MATRÍCULA                       ║ -->
+<!-- ╚══════════════════════════════════════════════════════════════╝ -->
+
+<div class="chapter-divider" id="cap-mat">
+  <span class="chapter-icon">📝</span>
+  <div class="chapter-number">Parte 1</div>
+  <h2 class="grad-mat">Matrícula do Aluno</h2>
+  <p class="chapter-subtitle">A entidade que liga aluno e disciplina — com notas e status!</p>
+</div>
+
+<!-- INTRO -->
+<section class="step-section" id="mat-intro">
+  <div class="step-header">
+    <div class="step-number sn-purple">🎯</div>
+    <div>
+      <div class="step-title">O que é uma Matrícula?</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">A tabela que conecta aluno e disciplina</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="concept">
+      <div class="concept-title">📝 MatriculaAluno — a tabela que conecta tudo!</div>
+      <p>A matrícula é uma entidade que liga um <strong style="color:var(--accent2)">Aluno</strong> a uma <strong style="color:var(--accent5)">Disciplina</strong>, com notas e um status. É como <strong style="color:var(--text)">o contrato que diz que o aluno Maria está cursando a disciplina de Backend</strong>.</p>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">Analogia: Matrícula no cursinho</div>
+      <p style="color:var(--text-dim)">Pensem num cursinho. O aluno existe (cadastro dele), o curso existe (ex: inglês). Mas é a <strong style="color:var(--text)">matrícula</strong> que liga os dois! A matrícula é um papel que diz "Maria está matriculada no curso de inglês, tirou 8 na primeira prova e 7 na segunda, então foi aprovada". Esse papel é a nossa tabela <code>matricula_aluno</code>.</p>
+    </div>
+
+    <h4 style="margin:20px 0 12px;color:var(--accent4)">🗄️ Como vai ficar no banco de dados</h4>
+    <div class="db-table">
+      <div class="db-table-header">🐘 Tabela: matricula_aluno</div>
+      <table>
+        <thead><tr><th>id</th><th>aluno_id 🔗</th><th>disciplina_id 🔗</th><th>nota1</th><th>nota2</th><th>status</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>1 (Maria)</td><td>1 (Backend)</td><td>8.0</td><td>7.5</td><td><span style="color:var(--accent3)">APROVADO</span></td></tr>
+          <tr><td>2</td><td>1 (Maria)</td><td>2 (Frontend)</td><td>5.0</td><td>4.0</td><td><span style="color:var(--accent2)">REPROVADO</span></td></tr>
+          <tr><td>3</td><td>2 (João)</td><td>1 (Backend)</td><td>—</td><td>—</td><td><span style="color:var(--accent5)">MATRICULADO</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">🔗</span>
+      <div class="tip-content">Vejam as colunas <strong>aluno_id</strong> e <strong>disciplina_id</strong>. São <strong>duas chaves estrangeiras</strong>! A matrícula "aponta" para o aluno E para a disciplina. É igual ao que vocês já viram com Disciplina → Professor, só que agora temos DOIS @ManyToOne na mesma entidade.</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- ENUM -->
+<section class="step-section" id="mat-enum">
+  <div class="step-header">
+    <div class="step-number sn-yellow">1.1</div>
+    <div>
+      <div class="step-title">Enum — MatriculaAlunoStatusEnum</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Um "menu fechado" de opções</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="concept">
+      <div class="concept-title">🏷️ O que é um Enum?</div>
+      <p>Enum é uma <strong style="color:var(--text)">lista fixa de opções</strong>. Em vez de usar uma String que pode ser digitada de qualquer jeito (tipo "aprovado", "APROVADO", "Aprovado", ou até "APROVDO" com erro), o Enum garante que <strong>só existem as opções que nós definimos</strong>.</p>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">Analogia: Menu do McDonald's</div>
+      <p style="color:var(--text-dim)">É como entrar no McDonald's. Você não pode pedir qualquer coisa — só o que tá no cardápio. O Enum é o cardápio fechado do nosso sistema: <strong style="color:var(--text)">ou é MATRICULADO, ou é APROVADO, ou é REPROVADO. Não tem outra opção!</strong></p>
+    </div>
+
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">enums/MatriculaAlunoStatusEnum.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7</div>
+      <pre>
+<span class="pkg">package br.com.alunoonline.api.enums;</span>
+
+<span class="kw">public enum</span> <span class="tp">MatriculaAlunoStatusEnum</span> {
+    <span class="nb">MATRICULADO</span>,
+    <span class="nb">APROVADO</span>,
+    <span class="nb">REPROVADO</span>
+}</pre>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">💡</span>
+      <div class="tip-content">Criem um novo pacote <code>enums</code> dentro de <code>br.com.alunoonline.api</code> e coloquem esse arquivo lá. A palavra-chave é <strong>enum</strong> (não é <code>class</code>!).</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- MODEL -->
+<section class="step-section" id="mat-model">
+  <div class="step-header">
+    <div class="step-number sn-red">1.2</div>
+    <div>
+      <div class="step-title">Model — MatriculaAluno.java</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">A novidade: DOIS @ManyToOne + @Enumerated!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">model/MatriculaAluno.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br>29<br>30<br>31<br>32</div>
+      <pre>
+<span class="pkg">package br.com.alunoonline.api.model;</span>
+
+<span class="pkg">import br.com.alunoonline.api.enums.MatriculaAlunoStatusEnum;</span>
+<span class="pkg">import jakarta.persistence.*;</span>
+<span class="pkg">import lombok.AllArgsConstructor;</span>
+<span class="pkg">import lombok.Data;</span>
+<span class="pkg">import lombok.NoArgsConstructor;</span>
+
+<span class="an">@AllArgsConstructor</span>
+<span class="an">@NoArgsConstructor</span>
+<span class="an">@Data</span>
+<span class="an">@Table</span>(name = <span class="st">"matricula_aluno"</span>)
+<span class="an">@Entity</span>
+<span class="kw">public class</span> <span class="tp">MatriculaAluno</span> {
+
+    <span class="an">@Id</span>
+    <span class="an">@GeneratedValue</span>(strategy = <span class="tp">GenerationType</span>.<span class="nb">IDENTITY</span>)
+    <span class="kw">private</span> <span class="tp">Long</span> id;
+
+    <span class="an">@ManyToOne</span>
+    <span class="an">@JoinColumn</span>(name = <span class="st">"aluno_id"</span>)
+    <span class="kw">private</span> <span class="tp">Aluno</span> aluno;
+
+    <span class="an">@ManyToOne</span>
+    <span class="an">@JoinColumn</span>(name = <span class="st">"disciplina_id"</span>)
+    <span class="kw">private</span> <span class="tp">Disciplina</span> disciplina;
+
+    <span class="kw">private</span> <span class="tp">Double</span> nota1;
+
+    <span class="kw">private</span> <span class="tp">Double</span> nota2;
+
+    <span class="an">@Enumerated</span>(<span class="tp">EnumType</span>.<span class="nb">STRING</span>)
+    <span class="kw">private</span> <span class="tp">MatriculaAlunoStatusEnum</span> status;
+}</pre>
+    </div>
+
+    <h4 style="margin:20px 0 10px;color:var(--accent5)">🏷️ As novidades aqui</h4>
+    <div class="annotation-grid">
+      <div class="annotation-card">
+        <div class="anno-name"><span class="at">@</span>ManyToOne x2</div>
+        <div class="anno-desc">DOIS relacionamentos! Uma matrícula aponta para UM aluno E para UMA disciplina.</div>
+      </div>
+      <div class="annotation-card">
+        <div class="anno-name"><span class="at">@</span>Enumerated(STRING)</div>
+        <div class="anno-desc">Salva o enum como texto legível no banco (ex: "APROVADO"). Sem isso, salvaria como número 0, 1, 2 — confuso!</div>
+      </div>
+    </div>
+
+    <div class="warning">
+      <span class="warning-icon">⚠️</span>
+      <div style="color:var(--text-dim);font-size:0.9rem"><strong style="color:var(--accent5)">Não esqueçam de adicionar @Enumerated!</strong> Se esquecerem, o banco vai salvar <code>0</code>, <code>1</code>, <code>2</code> em vez de <code>MATRICULADO</code>, <code>APROVADO</code>, <code>REPROVADO</code>. Fica muito difícil de entender depois!</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- REPOSITORY -->
+<section class="step-section" id="mat-repo">
+  <div class="step-header">
+    <div class="step-number sn-green">1.3</div>
+    <div>
+      <div class="step-title">Repository — MatriculaAlunoRepository</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Vocês já sabem fazer essa parte!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tip">
+      <span class="tip-icon">🎯</span>
+      <div class="tip-content"><strong>Exatamente igual aos outros repositories!</strong> Interface, extends JpaRepository, @Repository em cima. Vocês já são craques nisso.</div>
+    </div>
+
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">repository/MatriculaAlunoRepository.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</div>
+      <pre>
+<span class="pkg">package br.com.alunoonline.api.repository;</span>
+
+<span class="pkg">import br.com.alunoonline.api.model.MatriculaAluno;</span>
+<span class="pkg">import org.springframework.data.jpa.repository.JpaRepository;</span>
+<span class="pkg">import org.springframework.stereotype.Repository;</span>
+
+<span class="an">@Repository</span>
+<span class="kw">public interface</span> <span class="tp">MatriculaAlunoRepository</span> <span class="kw">extends</span> <span class="tp">JpaRepository</span>&lt;<span class="tp">MatriculaAluno</span>, <span class="tp">Long</span>&gt; {
+}</pre>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- SERVICE CRIAR -->
+<section class="step-section" id="mat-service-criar">
+  <div class="step-header">
+    <div class="step-number sn-yellow">1.4</div>
+    <div>
+      <div class="step-title">Service — criarMatricula</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">A sacada: o Service define o status inicial!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="concept">
+      <div class="concept-title">🎯 Regra de negócio: status inicial</div>
+      <p>Quando criamos uma matrícula, o status <strong>sempre</strong> começa como <strong style="color:var(--accent5)">MATRICULADO</strong>. O cliente da API não precisa mandar isso — o Service decide. Isso é uma <strong>regra de negócio</strong>, e é por isso que o Service existe!</p>
+    </div>
+
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">service/MatriculaAlunoService.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20</div>
+      <pre>
+<span class="pkg">package br.com.alunoonline.api.service;</span>
+
+<span class="pkg">import br.com.alunoonline.api.enums.MatriculaAlunoStatusEnum;</span>
+<span class="pkg">import br.com.alunoonline.api.model.MatriculaAluno;</span>
+<span class="pkg">import br.com.alunoonline.api.repository.MatriculaAlunoRepository;</span>
+<span class="pkg">import org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="pkg">import org.springframework.stereotype.Service;</span>
+
+<span class="an">@Service</span>
+<span class="kw">public class</span> <span class="tp">MatriculaAlunoService</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="tp">MatriculaAlunoRepository</span> matriculaAlunoRepository;
+
+    <span class="kw">public void</span> <span class="fn">criarMatricula</span>(<span class="tp">MatriculaAluno</span> matriculaAluno) {
+        <span class="cm">// O Service define o status inicial automaticamente!</span>
+        matriculaAluno.<span class="fn">setStatus</span>(<span class="tp">MatriculaAlunoStatusEnum</span>.<span class="nb">MATRICULADO</span>);
+        matriculaAlunoRepository.<span class="fn">save</span>(matriculaAluno);
+    }
+}</pre>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">💡</span>
+      <div class="tip-content">Vejam que <strong>o cliente só precisa mandar aluno e disciplina</strong> no POST. O status é definido pelo Service. Isso é o poder da camada de serviço: <strong>regras de negócio ficam escondidas do cliente</strong>.</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- CONTROLLER CRIAR -->
+<section class="step-section" id="mat-controller-criar">
+  <div class="step-header">
+    <div class="step-number sn-main">1.5</div>
+    <div>
+      <div class="step-title">Controller — criarMatricula</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">O Controller mais simples do mundo</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">controller/MatriculaAlunoController.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21</div>
+      <pre>
+<span class="pkg">package br.com.alunoonline.api.controller;</span>
+
+<span class="pkg">import br.com.alunoonline.api.model.MatriculaAluno;</span>
+<span class="pkg">import br.com.alunoonline.api.service.MatriculaAlunoService;</span>
+<span class="pkg">import org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="pkg">import org.springframework.http.HttpStatus;</span>
+<span class="pkg">import org.springframework.web.bind.annotation.*;</span>
+
+<span class="an">@RestController</span>
+<span class="an">@RequestMapping</span>(<span class="st">"/matriculas"</span>)
+<span class="kw">public class</span> <span class="tp">MatriculaAlunoController</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="tp">MatriculaAlunoService</span> matriculaAlunoService;
+
+    <span class="an">@PostMapping</span>
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">CREATED</span>)
+    <span class="kw">public void</span> <span class="fn">criarMatricula</span>(<span class="an">@RequestBody</span> <span class="tp">MatriculaAluno</span> matriculaAluno) {
+        matriculaAlunoService.<span class="fn">criarMatricula</span>(matriculaAluno);
+    }
+}</pre>
+    </div>
+
+    <h4 style="margin:20px 0 10px;color:var(--accent4)">🧪 Como testar no Swagger</h4>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">POST /matriculas — Body</span><span class="lang-badge json">JSON</span></div>
+      </div>
+      <pre>
+{
+  <span class="fn">"aluno"</span>: { <span class="fn">"id"</span>: <span class="num">1</span> },
+  <span class="fn">"disciplina"</span>: { <span class="fn">"id"</span>: <span class="num">1</span> }
+}</pre>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">🎉</span>
+      <div class="tip-content">Mandem só o aluno e a disciplina com o ID. O Spring é esperto: ele busca o aluno e a disciplina pelo ID e faz a ligação automaticamente. E o status já vem como <strong>MATRICULADO</strong> porque o Service coloca!</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════════════════════════╗ -->
+<!-- ║                      PARTE 2: DTO                           ║ -->
+<!-- ╚══════════════════════════════════════════════════════════════╝ -->
+
+<div class="chapter-divider" id="cap-dto">
+  <span class="chapter-icon">📦</span>
+  <div class="chapter-number">Parte 2</div>
+  <h2 class="grad-dto">DTO — Data Transfer Object</h2>
+  <p class="chapter-subtitle">A peça que transforma nossa API em uma API profissional!</p>
+</div>
+
+<!-- O PROBLEMA -->
+<section class="step-section" id="dto-problema">
+  <div class="step-header">
+    <div class="step-number sn-red">2.1</div>
+    <div>
+      <div class="step-title">Primeiro, a dor — depois a solução</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Imagine que queremos atualizar APENAS as notas...</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="problem-box">
+      <div class="problem-title">🤔 A situação</div>
+      <p style="color:var(--text-dim)">Uma matrícula já existe. O professor lançou a prova e quer <strong style="color:var(--text)">atualizar só as duas notas</strong>. Como o cliente (Swagger) vai mandar esses dados pra nossa API?</p>
+    </div>
+
+    <p style="margin:20px 0 10px;color:var(--text-dim)">Se usarmos o Model <code>MatriculaAluno</code> direto, o cliente teria que mandar ISSO aqui pra atualizar as notas:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">😱 Se usássemos MatriculaAluno direto</span><span class="lang-badge json">JSON</span></div>
+      </div>
+      <pre>
+{
+  <span class="fn">"id"</span>: <span class="num">1</span>,
+  <span class="fn">"aluno"</span>: {
+    <span class="fn">"id"</span>: <span class="num">1</span>,
+    <span class="fn">"nomeCompleto"</span>: <span class="st">"Maria Silva"</span>,
+    <span class="fn">"email"</span>: <span class="st">"maria@email.com"</span>,
+    <span class="fn">"cpf"</span>: <span class="st">"111.222.333-44"</span>
+  },
+  <span class="fn">"disciplina"</span>: {
+    <span class="fn">"id"</span>: <span class="num">1</span>,
+    <span class="fn">"nome"</span>: <span class="st">"Backend"</span>,
+    <span class="fn">"descricao"</span>: <span class="st">"..."</span>,
+    <span class="fn">"cargaHoraria"</span>: <span class="num">80</span>,
+    <span class="fn">"professor"</span>: { ... }
+  },
+  <span class="fn">"nota1"</span>: <span class="num">8.0</span>,      <span class="cm">👈 só isso interessa!</span>
+  <span class="fn">"nota2"</span>: <span class="num">7.5</span>,      <span class="cm">👈 e isso!</span>
+  <span class="fn">"status"</span>: <span class="st">"APROVADO"</span>
+}</pre>
+    </div>
+
+    <div class="problem-box">
+      <div class="problem-title">🚨 Os problemas</div>
+      <p style="color:var(--text-dim)">
+        <strong style="color:var(--accent2)">1. Excesso de dados:</strong> o cliente manda um monte de informação que a gente nem vai usar.<br>
+        <strong style="color:var(--accent2)">2. Feio e confuso:</strong> o JSON tá enorme, fica ruim de ler.<br>
+        <strong style="color:var(--accent2)">3. Risco:</strong> e se o cliente mudar o status pra APROVADO sem ter notas? Quem controla?<br>
+        <strong style="color:var(--accent2)">4. Acoplamento:</strong> se mudarmos o Model no futuro, quebramos tudo pro cliente.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- A SOLUÇÃO -->
+<section class="step-section" id="dto-solucao">
+  <div class="step-header">
+    <div class="step-number sn-green">2.2</div>
+    <div>
+      <div class="step-title">A solução — DTO!</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Uma classinha simples pra carregar só o que a gente precisa</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="solution-box">
+      <div class="solution-title">✨ Data Transfer Object</div>
+      <p style="color:var(--text-dim)">Um <strong style="color:var(--accent3)">DTO</strong> (Data Transfer Object) é uma <strong style="color:var(--text)">classe simples que serve só pra transportar dados</strong> entre o cliente e a nossa API. Diferente do Model (que representa a tabela), o DTO representa <strong>só o que a gente precisa para uma operação específica</strong>.</p>
+    </div>
+
+    <div class="analogy">
+      <div class="analogy-title">Analogia: formulário de academia</div>
+      <p style="color:var(--text-dim)">Imagine que vocês vão na academia e a recepcionista pergunta: "qual sua altura e seu peso?". Vocês não entregam o RG com todos os dados — só falam <strong style="color:var(--text)">altura e peso</strong>. É isso que um DTO faz: <strong>leva só o necessário para a operação</strong>.</p>
+    </div>
+
+    <div class="comparison">
+      <div class="comparison-col bad">
+        <div class="comparison-label">❌ Sem DTO (Model inteiro)</div>
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:12px">JSON com 15 campos pra atualizar 2 notas:</p>
+        <pre style="font-size:0.72rem;margin:0;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px">{
+  "id": 1,
+  "aluno": {
+    "id": 1,
+    "nomeCompleto": "...",
+    "email": "...",
+    "cpf": "..."
+  },
+  "disciplina": { ... },
+  "nota1": 8.0,
+  "nota2": 7.5,
+  "status": "..."
+}</pre>
+      </div>
+      <div class="comparison-col good">
+        <div class="comparison-label">✅ Com DTO</div>
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:12px">JSON limpo com só o que importa:</p>
+        <pre style="font-size:0.72rem;margin:0;padding:12px;background:rgba(0,0,0,0.3);border-radius:8px">{
+  "nota1": 8.0,
+  "nota2": 7.5
+}</pre>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">🎯</span>
+      <div class="tip-content"><strong>A regra de ouro:</strong> o DTO representa <strong>exatamente aquilo que o cliente precisa enviar ou receber</strong>, nada a mais, nada a menos. É um "formulário sob medida"!</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- CRIANDO O DTO -->
+<section class="step-section" id="dto-codigo">
+  <div class="step-header">
+    <div class="step-number sn-blue">2.3</div>
+    <div>
+      <div class="step-title">Criando nosso primeiro DTO</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Simples assim: duas variáveis e @Data</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p style="color:var(--text-dim);margin-bottom:16px">Primeiro, crie um pacote chamado <code>dtos</code> dentro de <code>br.com.alunoonline.api</code>. Depois, crie essa classe:</p>
+
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">dtos/AtualizarNotasRequestDTO.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</div>
+      <pre>
+<span class="pkg">package br.com.alunoonline.api.dtos;</span>
+
+<span class="pkg">import lombok.Data;</span>
+
+<span class="an">@Data</span>
+<span class="kw">public class</span> <span class="tp">AtualizarNotasRequestDTO</span> {
+    <span class="kw">private</span> <span class="tp">Double</span> nota1;
+    <span class="kw">private</span> <span class="tp">Double</span> nota2;
+}</pre>
+    </div>
+
+    <div class="concept">
+      <div class="concept-title">🔍 Observem como é simples!</div>
+      <p>É uma classe Java comum, sem @Entity, sem @Table, sem @Id. É apenas um <strong style="color:var(--text)">carregador de dados</strong>. Só tem:</p>
+    </div>
+
+    <div class="annotation-grid">
+      <div class="annotation-card">
+        <div class="anno-name"><span class="at">@</span>Data</div>
+        <div class="anno-desc">Lombok: gera getters e setters automaticamente.</div>
+      </div>
+      <div class="annotation-card">
+        <div class="anno-name" style="color:var(--accent3)">Double nota1</div>
+        <div class="anno-desc">A primeira nota que o professor vai lançar.</div>
+      </div>
+      <div class="annotation-card">
+        <div class="anno-name" style="color:var(--accent3)">Double nota2</div>
+        <div class="anno-desc">A segunda nota que o professor vai lançar.</div>
+      </div>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">💡</span>
+      <div class="tip-content">Por que o nome tem <strong>RequestDTO</strong>? Porque esse DTO vai ser usado numa <strong>requisição (request)</strong> do cliente. Se fosse para devolver algo pro cliente, chamaríamos de <strong>ResponseDTO</strong>. É uma convenção de nomenclatura que ajuda a entender o código!</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- ATUALIZAR NOTAS -->
+<section class="step-section" id="atualizar-notas">
+  <div class="step-header">
+    <div class="step-number sn-yellow">2.4</div>
+    <div>
+      <div class="step-title">O método atualizarNotas — passo a passo</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">O coração da aula de hoje</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="concept">
+      <div class="concept-title">🎯 O que esse método precisa fazer?</div>
+      <p>
+        1️⃣ Buscar a matrícula no banco pelo id<br>
+        2️⃣ Pegar as notas do DTO e colocar na matrícula<br>
+        3️⃣ Calcular a média: <code>(nota1 + nota2) / 2</code><br>
+        4️⃣ Se média ≥ 7.0 → <strong style="color:var(--accent3)">APROVADO</strong>. Senão → <strong style="color:var(--accent2)">REPROVADO</strong><br>
+        5️⃣ Salvar tudo no banco
+      </p>
+    </div>
+
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">service/MatriculaAlunoService.java (método adicional)</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20</div>
+      <pre>
+<span class="kw">public void</span> <span class="fn">atualizarNotas</span>(<span class="tp">Long</span> id, <span class="tp">AtualizarNotasRequestDTO</span> dto) {
+
+    <span class="cm">// 1️⃣ Busca a matrícula no banco</span>
+    <span class="tp">MatriculaAluno</span> matricula = matriculaAlunoRepository.<span class="fn">findById</span>(id).<span class="fn">get</span>();
+
+    <span class="cm">// 2️⃣ Pega as notas do DTO e coloca na matrícula</span>
+    matricula.<span class="fn">setNota1</span>(dto.<span class="fn">getNota1</span>());
+    matricula.<span class="fn">setNota2</span>(dto.<span class="fn">getNota2</span>());
+
+    <span class="cm">// 3️⃣ Calcula a média</span>
+    <span class="tp">Double</span> media = (dto.<span class="fn">getNota1</span>() + dto.<span class="fn">getNota2</span>()) / <span class="num">2</span>;
+
+    <span class="cm">// 4️⃣ Define o status baseado na média</span>
+    <span class="kw">if</span> (media >= <span class="num">7.0</span>) {
+        matricula.<span class="fn">setStatus</span>(<span class="tp">MatriculaAlunoStatusEnum</span>.<span class="nb">APROVADO</span>);
+    } <span class="kw">else</span> {
+        matricula.<span class="fn">setStatus</span>(<span class="tp">MatriculaAlunoStatusEnum</span>.<span class="nb">REPROVADO</span>);
+    }
+
+    <span class="cm">// 5️⃣ Salva tudo no banco</span>
+    matriculaAlunoRepository.<span class="fn">save</span>(matricula);
+}</pre>
+    </div>
+
+    <h4 style="margin:24px 0 12px;color:var(--accent4)">🔍 Vamos destrinchar cada linha</h4>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>1️⃣ Buscar a matrícula no banco</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
+        <div style="margin-top:8px;color:var(--text-dim);font-size:0.9rem">
+          <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-size:0.78rem;margin:8px 0">MatriculaAluno matricula = matriculaAlunoRepository.findById(id).get();</pre>
+          <p><code>findById(id)</code> vai no banco e busca a matrícula com aquele id. Ele devolve uma caixinha (Optional).</p>
+          <p style="margin-top:8px">O <code>.get()</code> abre a caixinha e pega o que tá dentro. Pronto, agora temos o objeto <code>matricula</code> pra trabalhar!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>2️⃣ Pegar as notas do DTO e colocar na matrícula</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
+        <div style="margin-top:8px;color:var(--text-dim);font-size:0.9rem">
+          <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-size:0.78rem;margin:8px 0">matricula.setNota1(dto.getNota1());
+matricula.setNota2(dto.getNota2());</pre>
+          <p><strong style="color:var(--text)">Aqui acontece a conversão DTO → Model!</strong></p>
+          <p style="margin-top:8px">Pegamos cada campo do DTO com <code>get</code> e colocamos na matrícula com <code>set</code>. É literalmente <strong>passar os dados de um lado pro outro</strong>.</p>
+          <p style="margin-top:8px">Pense: o DTO é o <strong>formulário preenchido pelo cliente</strong>. A matrícula é o <strong>registro oficial no banco</strong>. Estamos transcrevendo os dados!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>3️⃣ Calcular a média</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
+        <div style="margin-top:8px;color:var(--text-dim);font-size:0.9rem">
+          <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-size:0.78rem;margin:8px 0">Double media = (dto.getNota1() + dto.getNota2()) / 2;</pre>
+          <p>Matemática básica: soma as duas notas e divide por 2. Se o aluno tirou 8 e 7.5, a média é 7.75.</p>
+          <p style="margin-top:8px">Guardamos o resultado numa variável <code>media</code> pra usar logo abaixo.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>4️⃣ Definir status baseado na média</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
+        <div style="margin-top:8px;color:var(--text-dim);font-size:0.9rem">
+          <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-size:0.78rem;margin:8px 0">if (media >= 7.0) {
+    matricula.setStatus(MatriculaAlunoStatusEnum.APROVADO);
+} else {
+    matricula.setStatus(MatriculaAlunoStatusEnum.REPROVADO);
+}</pre>
+          <p><strong style="color:var(--text)">Regra de negócio!</strong> Se média ≥ 7.0, o aluno passa. Se não, reprova.</p>
+          <p style="margin-top:8px">Vejam que é o Service que decide o status. <strong>O cliente nunca manda o status</strong> — a API calcula sozinha.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="toggler">
+      <div class="toggler-header" onclick="toggleSection(this)">
+        <span>5️⃣ Salvar tudo no banco</span>
+        <span class="toggler-arrow">▼</span>
+      </div>
+      <div class="toggler-body">
+        <div style="margin-top:8px;color:var(--text-dim);font-size:0.9rem">
+          <pre style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;font-size:0.78rem;margin:8px 0">matriculaAlunoRepository.save(matricula);</pre>
+          <p><code>save</code> vai no banco e atualiza a linha. Como o objeto <code>matricula</code> já tem id, o Spring é esperto: <strong>ele atualiza em vez de criar nova</strong>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tip" style="margin-top:20px">
+      <span class="tip-icon">🎓</span>
+      <div class="tip-content"><strong>Resumo do que acabou de acontecer:</strong> O cliente mandou só 2 notas. A gente buscou a matrícula existente, colocou as notas nela, calculou média, decidiu status, salvou. <strong>O cliente não precisou saber de nada disso!</strong> Isso é uma API bem feita.</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- PATCH CONTROLLER -->
+<section class="step-section" id="patch-controller">
+  <div class="step-header">
+    <div class="step-number sn-main">2.5</div>
+    <div>
+      <div class="step-title">Controller — @PatchMapping</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Novidade: PATCH em vez de PUT!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="concept">
+      <div class="concept-title">🔧 PUT vs PATCH</div>
+      <p>
+        <strong style="color:var(--accent5)">PUT</strong> = atualiza o recurso <strong>inteiro</strong> (envia todos os campos).<br>
+        <strong style="color:var(--accent3)">PATCH</strong> = atualiza <strong>parcialmente</strong> (envia só o que muda).<br>
+        Para atualizar só as notas, <strong>PATCH</strong> é o ideal!
+      </p>
+    </div>
+
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">controller/MatriculaAlunoController.java (método adicional)</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5</div>
+      <pre>
+<span class="an">@PatchMapping</span>(<span class="st">"/atualizar-notas/{id}"</span>)
+<span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">NO_CONTENT</span>)
+<span class="kw">public void</span> <span class="fn">atualizarNotas</span>(<span class="an">@PathVariable</span> <span class="tp">Long</span> id,
+                            <span class="an">@RequestBody</span> <span class="tp">AtualizarNotasRequestDTO</span> dto) {
+    matriculaAlunoService.<span class="fn">atualizarNotas</span>(id, dto);
+}</pre>
+    </div>
+
+    <p style="margin:16px 0 10px;color:var(--text-dim)">Não esqueçam do import lá em cima:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">No topo do arquivo</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <pre><span class="pkg">import br.com.alunoonline.api.dtos.AtualizarNotasRequestDTO;</span></pre>
+    </div>
+
+    <h4 style="margin:20px 0 10px;color:var(--accent4)">🧪 Como testar no Swagger</h4>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">PATCH /matriculas/atualizar-notas/1</span><span class="lang-badge json">JSON</span></div>
+      </div>
+      <pre>
+{
+  <span class="fn">"nota1"</span>: <span class="num">8.0</span>,
+  <span class="fn">"nota2"</span>: <span class="num">7.5</span>
+}</pre>
+    </div>
+
+    <h4 style="margin:20px 0 10px;color:var(--accent4)">📍 Endpoints da Matrícula</h4>
+    <table class="endpoint-table">
+      <thead><tr><th>Método</th><th>URL</th><th>Ação</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method-badge post">POST</span></td><td><code>/matriculas</code></td><td>Criar matrícula</td><td>201</td></tr>
+        <tr><td><span class="method-badge patch">PATCH</span></td><td><code>/matriculas/atualizar-notas/{id}</code></td><td>Atualizar notas</td><td>204</td></tr>
+      </tbody>
+    </table>
+
+    <div class="solution-box">
+      <div class="solution-title">🎉 Teste e veja a mágica!</div>
+      <p style="color:var(--text-dim)">Crie uma matrícula com POST. Depois, mande um PATCH com <code>nota1: 8.0</code> e <code>nota2: 7.5</code>. Olhe no banco — o status mudou para <strong style="color:var(--accent3)">APROVADO</strong> automaticamente! Agora tente com <code>nota1: 4.0</code> e <code>nota2: 5.0</code> — vira <strong style="color:var(--accent2)">REPROVADO</strong>!</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ╔══════════════════════════════════════════════════════════════╗ -->
+<!-- ║                 PARTE 3: DESAFIO PETSHOP                    ║ -->
+<!-- ╚══════════════════════════════════════════════════════════════╝ -->
+
+<div class="chapter-divider" id="cap-desafio">
+  <span class="chapter-icon">🐶</span>
+  <div class="chapter-number">Parte 3</div>
+  <h2 class="grad-pet">Desafio Final: Petshop API</h2>
+  <p class="chapter-subtitle">Hora de voar com as próprias asas! Vocês vão construir uma API inteira do zero!</p>
+</div>
+
+<!-- DESAFIO INTRO -->
+<section class="step-section" id="desafio-intro">
+  <div class="challenge-banner">
+    <div class="challenge-icons">🐶 🐱 🦜</div>
+    <div class="challenge-title">Sistema de Petshop</div>
+    <div class="challenge-subtitle">Vamos criar uma API REST para gerenciar clientes de um petshop e seus pets. Vocês vão aplicar tudo que aprenderam no curso!</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:16px;color:var(--petshop)">🎯 O que vocês vão construir</h3>
+
+    <div class="concept">
+      <div class="concept-title">📋 Entidades do sistema</div>
+      <p>Duas entidades simples com um relacionamento, assim como fizeram com Professor e Disciplina:</p>
+    </div>
+
+    <div class="annotation-grid">
+      <div class="annotation-card">
+        <div class="anno-name" style="color:var(--accent2)">👤 Cliente</div>
+        <div class="anno-desc">
+          <strong>id, nomeCompleto, email, telefone</strong><br>
+          <span style="color:var(--text-dim);font-size:0.75rem;margin-top:4px;display:block">Os donos dos pets</span>
+        </div>
+      </div>
+      <div class="annotation-card">
+        <div class="anno-name" style="color:var(--petshop)">🐶 Pet</div>
+        <div class="anno-desc">
+          <strong>id, nome, raca, idade, cliente (FK)</strong><br>
+          <span style="color:var(--text-dim);font-size:0.75rem;margin-top:4px;display:block">Cada pet pertence a um cliente — @ManyToOne!</span>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="margin:20px 0 12px;color:var(--accent4)">📍 O que vocês precisam implementar</h4>
+
+    <table class="endpoint-table">
+      <thead><tr><th colspan="4" style="color:var(--accent2);padding-top:14px">👤 Cliente</th></tr><tr><th>Método</th><th>URL</th><th>Ação</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method-badge post">POST</span></td><td><code>/clientes</code></td><td>Cadastrar cliente</td><td>201</td></tr>
+        <tr><td><span class="method-badge get">GET</span></td><td><code>/clientes</code></td><td>Listar todos</td><td>200</td></tr>
+        <tr><td><span class="method-badge get">GET</span></td><td><code>/clientes/{id}</code></td><td>Buscar por id</td><td>200</td></tr>
+        <tr><td><span class="method-badge put">PUT</span></td><td><code>/clientes/{id}</code></td><td>Atualizar cliente</td><td>204</td></tr>
+        <tr><td><span class="method-badge delete">DELETE</span></td><td><code>/clientes/{id}</code></td><td>Deletar cliente</td><td>204</td></tr>
+      </tbody>
+      <thead><tr><th colspan="4" style="color:var(--petshop);padding-top:20px">🐶 Pet</th></tr><tr><th>Método</th><th>URL</th><th>Ação</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method-badge post">POST</span></td><td><code>/pets</code></td><td>Cadastrar pet</td><td>201</td></tr>
+        <tr><td><span class="method-badge get">GET</span></td><td><code>/pets</code></td><td>Listar todos</td><td>200</td></tr>
+        <tr><td><span class="method-badge get">GET</span></td><td><code>/pets/{id}</code></td><td>Buscar por id</td><td>200</td></tr>
+        <tr><td><span class="method-badge delete">DELETE</span></td><td><code>/pets/{id}</code></td><td>Deletar pet</td><td>204</td></tr>
+      </tbody>
+    </table>
+
+    <div class="tip">
+      <span class="tip-icon">💪</span>
+      <div class="tip-content"><strong>Vocês já sabem tudo isso!</strong> Não tem nada novo aqui — é puro reforço do que vocês aprenderam. Essa é a hora de sentir a satisfação de construir uma API sozinhos, do zero. A partir daqui, tem o código completo pra consulta.</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- SETUP -->
+<section class="step-section" id="pet-setup">
+  <div class="step-header">
+    <div class="step-number" style="background:var(--spring)">🍃</div>
+    <div>
+      <div class="step-title">Setup do Projeto Petshop</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Spring Initializr + application.properties</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p style="color:var(--text-dim);margin-bottom:16px">Acessem <a href="https://start.spring.io" target="_blank" style="color:var(--spring);font-weight:700">start.spring.io</a> e criem o projeto:</p>
+
+    <div class="annotation-grid" style="margin:16px 0">
+      <div class="annotation-card"><div class="anno-name">📦 Project</div><div class="anno-desc">Maven</div></div>
+      <div class="annotation-card"><div class="anno-name">☕ Language</div><div class="anno-desc">Java 21</div></div>
+      <div class="annotation-card"><div class="anno-name">🍃 Spring Boot</div><div class="anno-desc">Mais recente (versão sugerida)</div></div>
+      <div class="annotation-card"><div class="anno-name">📂 Group</div><div class="anno-desc">br.com.petshop</div></div>
+      <div class="annotation-card"><div class="anno-name">📄 Artifact</div><div class="anno-desc">api</div></div>
+    </div>
+
+    <h4 style="margin:16px 0 10px;color:var(--accent3)">📚 Dependências</h4>
+    <div class="annotation-grid">
+      <div class="annotation-card"><div class="anno-name" style="color:var(--spring)">Spring Web</div><div class="anno-desc">Para criar endpoints REST</div></div>
+      <div class="annotation-card"><div class="anno-name" style="color:var(--accent4)">Spring Data JPA</div><div class="anno-desc">Para acessar o banco</div></div>
+      <div class="annotation-card"><div class="anno-name" style="color:var(--accent4)">PostgreSQL Driver</div><div class="anno-desc">Driver do PostgreSQL</div></div>
+      <div class="annotation-card"><div class="anno-name" style="color:var(--accent2)">Lombok</div><div class="anno-desc">Gera getters/setters</div></div>
+    </div>
+
+    <h4 style="margin:20px 0 12px;color:var(--accent3)">⚙️ application.properties</h4>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="filename">src/main/resources/application.properties</span>
+      </div>
+      <pre>
+<span class="cm"># Nome da aplicação</span>
+<span class="an">spring.application.name</span>=<span class="st">Petshop API</span>
+
+<span class="cm"># Conexão com PostgreSQL</span>
+<span class="an">spring.datasource.url</span>=<span class="st">jdbc:postgresql://localhost:5432/petshop</span>
+<span class="an">spring.datasource.username</span>=<span class="st">postgres</span>
+<span class="an">spring.datasource.password</span>=<span class="st">123</span>
+<span class="an">spring.datasource.driver-class-name</span>=<span class="st">org.postgresql.Driver</span>
+
+<span class="cm"># Hibernate</span>
+<span class="an">spring.jpa.database-platform</span>=<span class="st">org.hibernate.dialect.PostgreSQLDialect</span>
+<span class="an">spring.jpa.hibernate.ddl-auto</span>=<span class="st">update</span>
+<span class="an">spring.jpa.show-sql</span>=<span class="st">true</span></pre>
+    </div>
+
+    <div class="warning">
+      <span class="warning-icon">⚠️</span>
+      <div style="color:var(--text-dim);font-size:0.9rem"><strong style="color:var(--accent5)">Não esqueçam!</strong> Criem o banco <code>petshop</code> no pgAdmin antes de rodar o projeto.</div>
+    </div>
+
+    <h4 style="margin:20px 0 12px;color:var(--accent6)">📂 Estrutura de pacotes</h4>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <span class="filename">Dentro de br.com.petshop.api</span>
+      </div>
+      <pre>
+br.com.petshop.api/
+├── 📄 ApiApplication.java  <span class="cm">← já vem pronto</span>
+├── 📁 <span class="an">model/</span>
+│   ├── Cliente.java
+│   └── Pet.java
+├── 📁 <span class="fn">repository/</span>
+│   ├── ClienteRepository.java
+│   └── PetRepository.java
+├── 📁 <span class="tp">service/</span>
+│   ├── ClienteService.java
+│   └── PetService.java
+└── 📁 <span class="kw">controller/</span>
+    ├── ClienteController.java
+    └── PetController.java</pre>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- CLIENTE MODEL -->
+<section class="step-section" id="pet-cliente-model">
+  <div class="step-header">
+    <div class="step-number sn-red">3.1</div>
+    <div>
+      <div class="step-title">Cliente — Model</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">A primeira entidade do Petshop</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">model/Cliente.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23</div>
+      <pre>
+<span class="pkg">package br.com.petshop.api.model;</span>
+
+<span class="pkg">import jakarta.persistence.*;</span>
+<span class="pkg">import lombok.AllArgsConstructor;</span>
+<span class="pkg">import lombok.Data;</span>
+<span class="pkg">import lombok.NoArgsConstructor;</span>
+
+<span class="an">@AllArgsConstructor</span>
+<span class="an">@NoArgsConstructor</span>
+<span class="an">@Data</span>
+<span class="an">@Table</span>(name = <span class="st">"cliente"</span>)
+<span class="an">@Entity</span>
+<span class="kw">public class</span> <span class="tp">Cliente</span> {
+
+    <span class="an">@Id</span>
+    <span class="an">@GeneratedValue</span>(strategy = <span class="tp">GenerationType</span>.<span class="nb">IDENTITY</span>)
+    <span class="kw">private</span> <span class="tp">Long</span> id;
+
+    <span class="kw">private</span> <span class="tp">String</span> nomeCompleto;
+
+    <span class="kw">private</span> <span class="tp">String</span> email;
+
+    <span class="kw">private</span> <span class="tp">String</span> telefone;
+}</pre>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">🎯</span>
+      <div class="tip-content">Percebem? É <strong>exatamente</strong> o mesmo padrão do Aluno e do Professor que vocês já fizeram. Só mudam os campos!</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- CLIENTE REPO -->
+<section class="step-section" id="pet-cliente-repo">
+  <div class="step-header">
+    <div class="step-number sn-green">3.2</div>
+    <div>
+      <div class="step-title">Cliente — Repository</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Vocês já fazem isso de olhos fechados</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">repository/ClienteRepository.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</div>
+      <pre>
+<span class="pkg">package br.com.petshop.api.repository;</span>
+
+<span class="pkg">import br.com.petshop.api.model.Cliente;</span>
+<span class="pkg">import org.springframework.data.jpa.repository.JpaRepository;</span>
+<span class="pkg">import org.springframework.stereotype.Repository;</span>
+
+<span class="an">@Repository</span>
+<span class="kw">public interface</span> <span class="tp">ClienteRepository</span> <span class="kw">extends</span> <span class="tp">JpaRepository</span>&lt;<span class="tp">Cliente</span>, <span class="tp">Long</span>&gt; {
+}</pre>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- CLIENTE SERVICE -->
+<section class="step-section" id="pet-cliente-service">
+  <div class="step-header">
+    <div class="step-number sn-yellow">3.3</div>
+    <div>
+      <div class="step-title">Cliente — Service</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Atenção: jeito mais simples de atualizar!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tip">
+      <span class="tip-icon">✨</span>
+      <div class="tip-content"><strong>Novidade boa!</strong> Lembram do <code>atualizarAlunoPorId</code> que era meio complicado? Agora vou mostrar um jeito <strong style="color:var(--accent3)">muito mais simples</strong> de atualizar!</div>
+    </div>
+
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">service/ClienteService.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br>29<br>30<br>31<br>32<br>33<br>34<br>35<br>36<br>37</div>
+      <pre>
+<span class="pkg">package br.com.petshop.api.service;</span>
+
+<span class="pkg">import br.com.petshop.api.model.Cliente;</span>
+<span class="pkg">import br.com.petshop.api.repository.ClienteRepository;</span>
+<span class="pkg">import org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="pkg">import org.springframework.stereotype.Service;</span>
+
+<span class="pkg">import java.util.List;</span>
+<span class="pkg">import java.util.Optional;</span>
+
+<span class="an">@Service</span>
+<span class="kw">public class</span> <span class="tp">ClienteService</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="tp">ClienteRepository</span> clienteRepository;
+
+    <span class="kw">public void</span> <span class="fn">criarCliente</span>(<span class="tp">Cliente</span> cliente) {
+        clienteRepository.<span class="fn">save</span>(cliente);
+    }
+
+    <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="tp">Cliente</span>&gt; <span class="fn">buscarTodosClientes</span>() {
+        <span class="kw">return</span> clienteRepository.<span class="fn">findAll</span>();
+    }
+
+    <span class="kw">public</span> <span class="tp">Optional</span>&lt;<span class="tp">Cliente</span>&gt; <span class="fn">buscarClientePorId</span>(<span class="tp">Long</span> id) {
+        <span class="kw">return</span> clienteRepository.<span class="fn">findById</span>(id);
+    }
+
+    <span class="kw">public void</span> <span class="fn">deletarClientePorId</span>(<span class="tp">Long</span> id) {
+        clienteRepository.<span class="fn">deleteById</span>(id);
+    }
+
+    <span class="cm">// ✨ Jeito simples de atualizar!</span>
+    <span class="kw">public void</span> <span class="fn">atualizarClientePorId</span>(<span class="tp">Long</span> id, <span class="tp">Cliente</span> cliente) {
+        cliente.<span class="fn">setId</span>(id);             <span class="cm">// força o id que veio da URL</span>
+        clienteRepository.<span class="fn">save</span>(cliente); <span class="cm">// save atualiza se id já existe!</span>
+    }
+}</pre>
+    </div>
+
+    <div class="solution-box">
+      <div class="solution-title">✨ Por que isso funciona?</div>
+      <p style="color:var(--text-dim)">O método <code>save</code> do Spring Data é esperto: <strong style="color:var(--text)">se o objeto tem um id que já existe no banco, ele atualiza</strong>. Se o id não existe ou é nulo, ele cria. Então só precisamos garantir que o id esteja correto — daí o <code>cliente.setId(id)</code> antes de salvar!</p>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">💡</span>
+      <div class="tip-content"><strong>Duas linhas pra atualizar.</strong> Simples, direto. É assim que muitos projetos de verdade fazem quando o caso é simples. Nada de Optional, nada de isEmpty — só setar o id e salvar.</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- CLIENTE CONTROLLER -->
+<section class="step-section" id="pet-cliente-controller">
+  <div class="step-header">
+    <div class="step-number sn-main">3.4</div>
+    <div>
+      <div class="step-title">Cliente — Controller</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Padrão CRUD completo</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">controller/ClienteController.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br>29<br>30<br>31<br>32<br>33<br>34<br>35<br>36<br>37<br>38<br>39<br>40<br>41<br>42<br>43<br>44<br>45<br>46<br>47<br>48</div>
+      <pre>
+<span class="pkg">package br.com.petshop.api.controller;</span>
+
+<span class="pkg">import br.com.petshop.api.model.Cliente;</span>
+<span class="pkg">import br.com.petshop.api.service.ClienteService;</span>
+<span class="pkg">import org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="pkg">import org.springframework.http.HttpStatus;</span>
+<span class="pkg">import org.springframework.web.bind.annotation.*;</span>
+
+<span class="pkg">import java.util.List;</span>
+<span class="pkg">import java.util.Optional;</span>
+
+<span class="an">@RestController</span>
+<span class="an">@RequestMapping</span>(<span class="st">"/clientes"</span>)
+<span class="kw">public class</span> <span class="tp">ClienteController</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="tp">ClienteService</span> clienteService;
+
+    <span class="an">@PostMapping</span>
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">CREATED</span>)
+    <span class="kw">public void</span> <span class="fn">criarCliente</span>(<span class="an">@RequestBody</span> <span class="tp">Cliente</span> cliente) {
+        clienteService.<span class="fn">criarCliente</span>(cliente);
+    }
+
+    <span class="an">@GetMapping</span>
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">OK</span>)
+    <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="tp">Cliente</span>&gt; <span class="fn">buscarTodosClientes</span>() {
+        <span class="kw">return</span> clienteService.<span class="fn">buscarTodosClientes</span>();
+    }
+
+    <span class="an">@GetMapping</span>(<span class="st">"/{id}"</span>)
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">OK</span>)
+    <span class="kw">public</span> <span class="tp">Optional</span>&lt;<span class="tp">Cliente</span>&gt; <span class="fn">buscarClientePorId</span>(<span class="an">@PathVariable</span> <span class="tp">Long</span> id) {
+        <span class="kw">return</span> clienteService.<span class="fn">buscarClientePorId</span>(id);
+    }
+
+    <span class="an">@DeleteMapping</span>(<span class="st">"/{id}"</span>)
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">NO_CONTENT</span>)
+    <span class="kw">public void</span> <span class="fn">deletarClientePorId</span>(<span class="an">@PathVariable</span> <span class="tp">Long</span> id) {
+        clienteService.<span class="fn">deletarClientePorId</span>(id);
+    }
+
+    <span class="an">@PutMapping</span>(<span class="st">"/{id}"</span>)
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">NO_CONTENT</span>)
+    <span class="kw">public void</span> <span class="fn">atualizarClientePorId</span>(<span class="an">@RequestBody</span> <span class="tp">Cliente</span> cliente,
+                                      <span class="an">@PathVariable</span> <span class="tp">Long</span> id) {
+        clienteService.<span class="fn">atualizarClientePorId</span>(id, cliente);
+    }
+}</pre>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">🎯</span>
+      <div class="tip-content">Pronto! Cliente completo. 5 endpoints, tudo no padrão. Se vocês fizeram Aluno, Professor e Disciplina, isso aqui sai em 5 minutos.</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- PET MODEL -->
+<section class="step-section" id="pet-pet-model">
+  <div class="step-header">
+    <div class="step-number sn-pet">3.5</div>
+    <div>
+      <div class="step-title">Pet — Model</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">A entidade com @ManyToOne de Cliente!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="concept">
+      <div class="concept-title">🔗 O relacionamento</div>
+      <p>Um cliente pode ter <strong>vários pets</strong>. Cada pet pertence a <strong>um cliente</strong>. Isso é um <code>@ManyToOne</code> — exatamente igual ao Disciplina → Professor!</p>
+    </div>
+
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">model/Pet.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br>29</div>
+      <pre>
+<span class="pkg">package br.com.petshop.api.model;</span>
+
+<span class="pkg">import jakarta.persistence.*;</span>
+<span class="pkg">import lombok.AllArgsConstructor;</span>
+<span class="pkg">import lombok.Data;</span>
+<span class="pkg">import lombok.NoArgsConstructor;</span>
+
+<span class="an">@AllArgsConstructor</span>
+<span class="an">@NoArgsConstructor</span>
+<span class="an">@Data</span>
+<span class="an">@Table</span>(name = <span class="st">"pet"</span>)
+<span class="an">@Entity</span>
+<span class="kw">public class</span> <span class="tp">Pet</span> {
+
+    <span class="an">@Id</span>
+    <span class="an">@GeneratedValue</span>(strategy = <span class="tp">GenerationType</span>.<span class="nb">IDENTITY</span>)
+    <span class="kw">private</span> <span class="tp">Long</span> id;
+
+    <span class="kw">private</span> <span class="tp">String</span> nome;
+
+    <span class="kw">private</span> <span class="tp">String</span> raca;
+
+    <span class="kw">private</span> <span class="tp">Integer</span> idade;
+
+    <span class="an">@ManyToOne</span>
+    <span class="an">@JoinColumn</span>(name = <span class="st">"cliente_id"</span>)
+    <span class="kw">private</span> <span class="tp">Cliente</span> cliente;
+}</pre>
+    </div>
+
+    <h4 style="margin:20px 0 12px;color:var(--accent4)">🗄️ Como fica no banco</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="db-table">
+        <div class="db-table-header">🐘 cliente</div>
+        <table>
+          <thead><tr><th>id</th><th>nome</th></tr></thead>
+          <tbody>
+            <tr><td><span style="color:var(--accent5)">1</span></td><td>Ana Silva</td></tr>
+            <tr><td><span style="color:var(--accent5)">2</span></td><td>João Costa</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="db-table">
+        <div class="db-table-header">🐘 pet</div>
+        <table>
+          <thead><tr><th>id</th><th>nome</th><th style="color:var(--accent2)">cliente_id</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Rex 🐶</td><td><span style="color:var(--accent5)">1</span></td></tr>
+            <tr><td>2</td><td>Mia 🐱</td><td><span style="color:var(--accent5)">1</span></td></tr>
+            <tr><td>3</td><td>Thor 🐶</td><td><span style="color:var(--accent5)">2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- PET REPO -->
+<section class="step-section" id="pet-pet-repo">
+  <div class="step-header">
+    <div class="step-number sn-green">3.6</div>
+    <div>
+      <div class="step-title">Pet — Repository</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Fácil, fácil</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">repository/PetRepository.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9</div>
+      <pre>
+<span class="pkg">package br.com.petshop.api.repository;</span>
+
+<span class="pkg">import br.com.petshop.api.model.Pet;</span>
+<span class="pkg">import org.springframework.data.jpa.repository.JpaRepository;</span>
+<span class="pkg">import org.springframework.stereotype.Repository;</span>
+
+<span class="an">@Repository</span>
+<span class="kw">public interface</span> <span class="tp">PetRepository</span> <span class="kw">extends</span> <span class="tp">JpaRepository</span>&lt;<span class="tp">Pet</span>, <span class="tp">Long</span>&gt; {
+}</pre>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- PET SERVICE -->
+<section class="step-section" id="pet-pet-service">
+  <div class="step-header">
+    <div class="step-number sn-yellow">3.7</div>
+    <div>
+      <div class="step-title">Pet — Service</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Sem update, só os outros métodos</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">service/PetService.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br>29<br>30<br>31</div>
+      <pre>
+<span class="pkg">package br.com.petshop.api.service;</span>
+
+<span class="pkg">import br.com.petshop.api.model.Pet;</span>
+<span class="pkg">import br.com.petshop.api.repository.PetRepository;</span>
+<span class="pkg">import org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="pkg">import org.springframework.stereotype.Service;</span>
+
+<span class="pkg">import java.util.List;</span>
+<span class="pkg">import java.util.Optional;</span>
+
+<span class="an">@Service</span>
+<span class="kw">public class</span> <span class="tp">PetService</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="tp">PetRepository</span> petRepository;
+
+    <span class="kw">public void</span> <span class="fn">criarPet</span>(<span class="tp">Pet</span> pet) {
+        petRepository.<span class="fn">save</span>(pet);
+    }
+
+    <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="tp">Pet</span>&gt; <span class="fn">buscarTodosPets</span>() {
+        <span class="kw">return</span> petRepository.<span class="fn">findAll</span>();
+    }
+
+    <span class="kw">public</span> <span class="tp">Optional</span>&lt;<span class="tp">Pet</span>&gt; <span class="fn">buscarPetPorId</span>(<span class="tp">Long</span> id) {
+        <span class="kw">return</span> petRepository.<span class="fn">findById</span>(id);
+    }
+
+    <span class="kw">public void</span> <span class="fn">deletarPetPorId</span>(<span class="tp">Long</span> id) {
+        petRepository.<span class="fn">deleteById</span>(id);
+    }
+}</pre>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- PET CONTROLLER -->
+<section class="step-section" id="pet-pet-controller">
+  <div class="step-header">
+    <div class="step-number sn-main">3.8</div>
+    <div>
+      <div class="step-title">Pet — Controller</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">O último arquivo do projeto!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-block with-lines">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">controller/PetController.java</span><span class="lang-badge java">Java</span></div>
+      </div>
+      <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br>29<br>30<br>31<br>32<br>33<br>34<br>35<br>36<br>37<br>38<br>39<br>40<br>41</div>
+      <pre>
+<span class="pkg">package br.com.petshop.api.controller;</span>
+
+<span class="pkg">import br.com.petshop.api.model.Pet;</span>
+<span class="pkg">import br.com.petshop.api.service.PetService;</span>
+<span class="pkg">import org.springframework.beans.factory.annotation.Autowired;</span>
+<span class="pkg">import org.springframework.http.HttpStatus;</span>
+<span class="pkg">import org.springframework.web.bind.annotation.*;</span>
+
+<span class="pkg">import java.util.List;</span>
+<span class="pkg">import java.util.Optional;</span>
+
+<span class="an">@RestController</span>
+<span class="an">@RequestMapping</span>(<span class="st">"/pets"</span>)
+<span class="kw">public class</span> <span class="tp">PetController</span> {
+
+    <span class="an">@Autowired</span>
+    <span class="tp">PetService</span> petService;
+
+    <span class="an">@PostMapping</span>
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">CREATED</span>)
+    <span class="kw">public void</span> <span class="fn">criarPet</span>(<span class="an">@RequestBody</span> <span class="tp">Pet</span> pet) {
+        petService.<span class="fn">criarPet</span>(pet);
+    }
+
+    <span class="an">@GetMapping</span>
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">OK</span>)
+    <span class="kw">public</span> <span class="tp">List</span>&lt;<span class="tp">Pet</span>&gt; <span class="fn">buscarTodosPets</span>() {
+        <span class="kw">return</span> petService.<span class="fn">buscarTodosPets</span>();
+    }
+
+    <span class="an">@GetMapping</span>(<span class="st">"/{id}"</span>)
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">OK</span>)
+    <span class="kw">public</span> <span class="tp">Optional</span>&lt;<span class="tp">Pet</span>&gt; <span class="fn">buscarPetPorId</span>(<span class="an">@PathVariable</span> <span class="tp">Long</span> id) {
+        <span class="kw">return</span> petService.<span class="fn">buscarPetPorId</span>(id);
+    }
+
+    <span class="an">@DeleteMapping</span>(<span class="st">"/{id}"</span>)
+    <span class="an">@ResponseStatus</span>(<span class="tp">HttpStatus</span>.<span class="nb">NO_CONTENT</span>)
+    <span class="kw">public void</span> <span class="fn">deletarPetPorId</span>(<span class="an">@PathVariable</span> <span class="tp">Long</span> id) {
+        petService.<span class="fn">deletarPetPorId</span>(id);
+    }
+}</pre>
+    </div>
+  </div>
+</section>
+
+<div class="section-connector"><div class="line"></div></div>
+
+<!-- TESTAR -->
+<section class="step-section" id="pet-testar">
+  <div class="step-header">
+    <div class="step-number sn-purple">🧪</div>
+    <div>
+      <div class="step-title">Testando tudo no Swagger</div>
+      <div style="color:var(--text-dim);font-size:0.88rem">Hora de ver o Petshop funcionando!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p style="color:var(--text-dim);margin-bottom:20px">Rodem a aplicação e acessem <code>http://localhost:8080/swagger-ui.html</code>. Aqui estão os JSONs pra testar:</p>
+
+    <h4 style="color:var(--accent2);margin:16px 0 10px">👤 1. Criar um cliente</h4>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">POST /clientes</span><span class="lang-badge json">JSON</span></div>
+      </div>
+      <pre>
+{
+  <span class="fn">"nomeCompleto"</span>: <span class="st">"Ana Silva"</span>,
+  <span class="fn">"email"</span>: <span class="st">"ana@email.com"</span>,
+  <span class="fn">"telefone"</span>: <span class="st">"(83) 99999-0000"</span>
+}</pre>
+    </div>
+
+    <h4 style="color:var(--petshop);margin:20px 0 10px">🐶 2. Criar um pet para o cliente id=1</h4>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">POST /pets</span><span class="lang-badge json">JSON</span></div>
+      </div>
+      <pre>
+{
+  <span class="fn">"nome"</span>: <span class="st">"Rex"</span>,
+  <span class="fn">"raca"</span>: <span class="st">"Golden Retriever"</span>,
+  <span class="fn">"idade"</span>: <span class="num">3</span>,
+  <span class="fn">"cliente"</span>: { <span class="fn">"id"</span>: <span class="num">1</span> }
+}</pre>
+    </div>
+
+    <h4 style="color:var(--accent);margin:20px 0 10px">📝 3. Atualizar um cliente</h4>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="filename">PUT /clientes/1</span><span class="lang-badge json">JSON</span></div>
+      </div>
+      <pre>
+{
+  <span class="fn">"nomeCompleto"</span>: <span class="st">"Ana Silva Costa"</span>,
+  <span class="fn">"email"</span>: <span class="st">"ana.costa@email.com"</span>,
+  <span class="fn">"telefone"</span>: <span class="st">"(83) 99999-1111"</span>
+}</pre>
+    </div>
+
+    <div class="tip">
+      <span class="tip-icon">🎯</span>
+      <div class="tip-content"><strong>Dica na hora do PUT:</strong> não precisam mandar o id no corpo. O Service pega o id da URL e coloca automaticamente com <code>cliente.setId(id)</code>.</div>
+    </div>
+  </div>
+
+  <!-- RESUMO FINAL -->
+  <div class="card" style="background:linear-gradient(135deg,rgba(108,99,255,0.05),rgba(6,214,160,0.03));border-color:rgba(108,99,255,0.15)">
+    <h3 style="margin-bottom:16px;color:var(--accent)">🎓 Parabéns! Vocês construíram duas APIs completas!</h3>
+    <p style="color:var(--text-dim);margin-bottom:20px">Em 3 meses vocês saíram de "o que é uma classe?" para <strong style="color:var(--text)">construir APIs REST com relacionamentos, regras de negócio, enums e DTOs</strong>. Isso é <strong style="color:var(--accent3)">enorme</strong>. Tenham orgulho do caminho que percorreram!</p>
+
+    <div style="display:grid;gap:10px;color:var(--text-dim);font-size:0.92rem">
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Spring Boot do zero</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Entidades JPA com relacionamentos (@ManyToOne)</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Repositórios, Services e Controllers</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> CRUD completo (POST, GET, PUT, DELETE)</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Enum com @Enumerated</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> DTO para operações específicas</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> PATCH para atualizações parciais</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Regras de negócio no Service</div>
+      <div style="display:flex;gap:10px"><span style="color:var(--accent3)">✅</span> Testes no Swagger</div>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  Feito com <span class="heart">💜</span> para os alunos da UNIESP — João Pessoa, PB<br>
+  <span style="font-size:0.75rem;margin-top:8px;display:block">Última aula — Java/Spring Boot com Kelson Almeida</span>
+</footer>
+
+</div><!-- /container -->
+
+<script>
+// SCROLL PROGRESS
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  const pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;
+  document.getElementById('progressBar').style.width=pct+'%';
+});
+
+// REVEAL ON SCROLL
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:0.12});
+document.querySelectorAll('.step-section').forEach(s=>observer.observe(s));
+
+// SIDEBAR
+function toggleSidebar(){
+  document.getElementById('sidebarNav').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function goTo(id){
+  toggleSidebar();
+  setTimeout(()=>{
+    document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  },300);
+}
+
+// TOGGLER
+function toggleSection(header){
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+</script>
+</body>
+</html>
